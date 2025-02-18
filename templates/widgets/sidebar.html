@@ -1,0 +1,229 @@
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2 active" aria-current="page"
+           href="/home">
+            <svg class="bi">
+                <use xlink:href="#house-fill"/>
+            </svg>
+            Bosh sahifa
+        </a>
+    </li>
+
+    <hr class="hr">
+
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"
+           href="#productsSection"
+           role="button" aria-expanded="false" aria-controls="productsSection">
+            <i class="bi bi-box"></i>
+            Mahsulot
+        </a>
+        <div class="collapse" id="productsSection">
+            <ul class="list-group list-group-flush ms-4">
+                <li class="">
+                    <a href="/product/category/list" class="nav-link"><i class="bi bi-tag"></i>
+                        Mahsulot kategoriyalari
+                    </a>
+                </li>
+                <li class="">
+                    <a href="/product/measurement/list" class="nav-link"><i
+                            class="bi bi-rulers"></i> O'lchov birliklari</a>
+                </li>
+                <li class="">
+                    <a href="/product/list" class="nav-link">
+                        <i class="bi bi-boxes"></i> Barcha mahsulotlar
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"
+           href="#warehouseSection"
+           role="button" aria-expanded="false" aria-controls="warehouseSection">
+            <i class="bi bi-bag-plus"></i>
+            Sotib olish
+        </a>
+        <div class="collapse" id="warehouseSection">
+            <ul class="list-group list-group-flush ms-4">
+                <li class="">
+                    <a href="/document/purchase/list" class="nav-link">
+                        <i class="bi bi-upc-scan"></i>
+                        Sotib olishlar
+                    </a>
+                </li>
+                <li class="">
+                    <a href="/document/warehouse/list" class="nav-link">
+                        <i class="bi bi-boxes"></i>
+                        Ombordagi mahsulotlar
+                    </a>
+                </li>
+                <li class="">
+                    <a href="/document/purchase-return/list" class="nav-link">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Sotib olingan mahsulotlarni qaytarish
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <div class="d-flex justify-content-between">
+            <a href="/customers/list" class="nav-link">
+                <i class="bi bi-person-lines-fill"></i>
+                Haridorlar
+            </a>
+            <a href="/customers/create" class="nav-link"><i class="bi bi-plus-circle"></i></a>
+        </div>
+        {#        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"#}
+        {#           href="#CustomerSection"#}
+        {#           role="button" aria-expanded="false" aria-controls="CustomerSection">#}
+        {#            <i class="bi bi-people"></i>#}
+        {#            Haridorlar#}
+        {#        </a>#}
+        <div class="collapse" id="CustomerSection">
+            <ul class="list-group list-group-flush ms-4">
+                <li class="">
+                    <a href="/customers/list" class="nav-link">
+                        <i class="bi bi-person-lines-fill"></i>
+                        Haridorlar ro'yhati
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"
+           href="#Sales"
+           role="button" aria-expanded="false" aria-controls="Sales">
+            <i class="bi bi-shop-window"></i>
+            Savdo
+        </a>
+        <div class="collapse" id="Sales">
+            <ul class="list-group list-group-flush ms-4">
+                <li class="">
+                    <a href="/document/sales/list" class="nav-link">
+                        <i class="bi bi-cart4"></i>
+                        Savdo
+                    </a>
+                </li>
+                <li class="">
+                    <a href="/document/sales-return/list" class="nav-link">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Savdoni qaytarish
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
+
+    <hr class="hr">
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"
+           href="#PaymentsHistory"
+           role="button" aria-expanded="false" aria-controls="PaymentsHistory">
+            <i class="bi bi-currency-dollar"></i>
+            To'lovlar
+        </a>
+        <div class="collapse" id="PaymentsHistory">
+            <ul class="list-group list-group-flush ms-4">
+                <li class="">
+                    <a href="/payments/customer/list" class="nav-link">
+                        <i class="bi bi-currency-exchange"></i>
+                        Haridorlar to'lovlari
+                    </a>
+                </li>
+                <li class="">
+                    <a href="/payments/organization/list" class="nav-link">
+                        <i class="bi bi-bank"></i>
+                        Tashkilotning to'lovlari
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"
+           href="#ReportAndAnalysis"
+           role="button" aria-expanded="false" aria-controls="ReportAndAnalysis">
+            <i class="bi bi-graph-up-arrow"></i>
+            Hisobot va tahlillar
+        </a>
+        <div class="collapse" id="ReportAndAnalysis">
+            <ul class="list-group list-group-flush ms-4">
+                <li class="">
+                    <a href="/reports/sales" class="nav-link">
+                        <i class="bi bi-pie-chart"></i>
+                        Savdo hisobotlari
+                    </a>
+                </li>
+
+{#                <li class="">#}
+{#                    <a href="/reports/sales" class="nav-link">#}
+{#                        <i class="bi bi-clipboard-data"></i>#}
+{#                        Inventarizatsiya hisobotlari#}
+{#                    </a>#}
+{#                </li>#}
+
+                <li class="">
+                    <a href="/reports/customer" class="nav-link">
+                        <i class="bi bi-bar-chart-line"></i>
+                        Haridor hisobotlari
+                    </a>
+                </li>
+
+{#                <li class="">#}
+{#                    <a href="/reports/sales" class="nav-link">#}
+{#                        <i class="bi bi-currency-dollar"></i>#}
+{#                        Moliyaviy hisobotlar#}
+{#                    </a>#}
+{#                </li>#}
+            </ul>
+        </div>
+    </li>
+
+    {#    <li class="nav-item">#}
+    {#        <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="collapse"#}
+    {#           href="#LogsAndHistory"#}
+    {#           role="button" aria-expanded="false" aria-controls="LogsAndHistory">#}
+    {#            <i class="bi bi-clock-history"></i>#}
+    {#            Loglar va Tarix#}
+    {#        </a>#}
+    {#        <div class="collapse" id="LogsAndHistory">#}
+    {#            <ul class="list-group list-group-flush ms-4">#}
+    {#                <li class="">#}
+    {#                    <a href="/document/logs/list" class="nav-link">#}
+    {#                        <i class="bi bi-clock"></i>#}
+    {#                        O'zgarishlar tarixi#}
+    {#                    </a>#}
+    {#                </li>#}
+    {#            </ul>#}
+    {#        </div>#}
+    {#    </li>#}
+
+</ul>
+
+<hr class="my-3">
+
+<ul class="nav flex-column mb-auto">
+{#    <li class="nav-item">#}
+{#        <a class="nav-link d-flex align-items-center gap-2" href="#">#}
+{#            <svg class="bi">#}
+{#                <use xlink:href="#gear-wide-connected"/>#}
+{#            </svg>#}
+{#            Settings#}
+{#        </a>#}
+{#    </li>#}
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" href="/logout">
+            <svg class="bi">
+                <use xlink:href="#door-closed"/>
+            </svg>
+            Sign out
+        </a>
+    </li>
+</ul>

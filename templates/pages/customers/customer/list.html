@@ -1,0 +1,68 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Haridorlar</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/customers/create" type="button" class="btn btn-sm btn-outline-primary">Yangi
+                        qoshish <i
+                                class="bi bi-plus-circle-dotted"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <h2>Haridorlar ro'yhati</h2>
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-10">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Ism, familiya yoki telefon"
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="col-2 text-end">
+                    <div class="btn-group">
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-success">Filter <i
+                                    class="bi bi-search"></i></button>
+                            <a href="/customers/list" class="btn btn-primary">Tozalash <i
+                                    class="bi bi-arrow-clockwise"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive small">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">To'liq ismi</th>
+                    <th scope="col">Qarzi</th>
+                    <th scope="col">Telefon raqami</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="/customers/{{ object.id }}">{{ object.first_name }} {{ object.last_name }}</a></td>
+                        <td class="text-danger">{{ object.get_total_debt|floatformat:2|intcomma }}</td>
+                        <td>{{ object.phone_number }}</td>
+                        <td>
+                            <a href="/customers/update/{{ object.id }}"><i
+                                    class="bi bi-pencil-square"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "widgets/pagination.html" %}
+    </main>
+{% endblock %}

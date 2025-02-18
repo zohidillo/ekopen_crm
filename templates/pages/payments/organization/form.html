@@ -1,0 +1,116 @@
+{% extends "home.html" %}
+{% load static %}
+
+{% block main %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">To'lovlar</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/payments/organization/create" type="button" class="btn btn-sm btn-outline-primary">
+                        Yangi qo'shish <i class="bi bi-plus-circle-dotted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Bosh sahifa</a></li>
+                <li class="breadcrumb-item"><a href="/payments/organization/list">To'lovlar ro'yhati</a></li>
+                <li class="breadcrumb-item active" aria-current="page">To'lov</li>
+            </ol>
+        </nav>
+
+
+        <div class="container mt-5">
+            <form id="payment-form" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="doc-order">Buyurtmalar:</label>
+                    <select id="doc-order" name="doc_purchase" class="form-control" required>
+                        <option value="">--------------------</option>
+                        <!-- Options will be populated here dynamically -->
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="amount">Miqdor:</label>
+                    <input type="number" id="amount" name="amount" class="form-control" min="0.0" step="0.01"
+                           value="{% if payment %}{{ payment.amount }}{% else %}0.0{% endif %}" required>
+                    <div id="amount-error" class="text-danger" style="display:none;">Miqdor qarzdan oshmasligi kerak!
+                    </div>
+                </div>
+                <br>
+                <button type="submit" id="submit-button" class="btn btn-primary" disabled>Saqlash</button>
+            </form>
+        </div>
+
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const $docOrderSelect = $('#doc-order');
+            const $amountInput = $('#amount');
+            const $submitButton = $('#submit-button');
+            const $amountError = $('#amount-error');
+            let debts = {}; // Object to hold the debts for each purchase
+
+            // Fetch the list of purchases from the API
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/purchase/list',
+                method: 'GET',
+                success: function (data) {
+                    // Populate the select dropdown and debts object
+                    $.each(data, function (index, item) {
+                        const option = $('<option></option>')
+                            .val(item.id) // Assuming 'id' is the identifier
+                            .text(`${item.name} (Qarz: ${item.debt})`); // Adjust according to your data structure
+                        $docOrderSelect.append(option);
+                        debts[item.id] = item.debt; // Assuming 'debt' is the key in your data
+                    });
+                    const selectedPurchaseId = '{{ payment.doc_purchase.id|default:"" }}'; // Get the selected purchase ID from the payment object
+                    if (selectedPurchaseId) {
+                        $docOrderSelect.val(selectedPurchaseId);
+                    }
+                },
+                error: function (error) {
+                    console.error('Error fetching purchases:', error);
+                }
+            });
+
+            // Validate the form
+            function validateForm() {
+                const selectedPurchaseId = $docOrderSelect.val();
+                const amount = parseFloat($amountInput.val());
+
+                // Check if a purchase is selected and if the amount is a valid number
+                const isAmountValid = !isNaN(amount) && amount >= 0.0;
+                const isDebtValid = selectedPurchaseId && amount <= debts[selectedPurchaseId];
+
+                // Show error message if amount is invalid
+                if (!isDebtValid) {
+                    $amountError.show();
+                } else {
+                    $amountError.hide();
+                }
+
+                // Enable or disable the submit button based on the validations
+                $submitButton.prop('disabled', !(isAmountValid && isDebtValid));
+            }
+
+            // Restrict input to numeric values
+            $amountInput.on('input', function () {
+                const value = $(this).val();
+                if (value.match(/[^0-9.]/)) {
+                    $(this).val(value.replace(/[^0-9.]/g, '')); // Remove non-numeric characters
+                }
+                validateForm();
+            });
+
+            // Event listeners for validation
+            $docOrderSelect.on('change', validateForm);
+        });
+    </script>
+{% endblock %}

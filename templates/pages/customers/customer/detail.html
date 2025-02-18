@@ -1,0 +1,119 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <!-- Header and Navigation -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Haridor Tafsilotlari</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/customers/update/{{ object.id }}" type="button"
+                       class="btn btn-sm btn-outline-primary">O'zgartirish <i class="bi bi-pencil"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>{{ object.get_full_name }}</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>Telefon raqami:</strong> {{ object.phone_number }}</p>
+                <p><strong>Manzil:</strong> {{ object.address }}</p>
+                <p><strong>Ro'yxatdan o'tgan sana:</strong> {{ object.added_at }}</p>
+                <p><strong>Jami qarzi:</strong> {{ object.get_total_debt|floatformat:2|intcomma }} UZS</p>
+            </div>
+        </div>
+
+        <!-- Customer Orders -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Buyurtmalari</h3>
+            </div>
+            <div class="card-body">
+                {% if object.doc_orders.all %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Buyurtma №</th>
+                            <th>Sana</th>
+                            <th>Umumiy summa</th>
+                            <th>To'langan summa</th>
+                            <th>Holati</th>
+                            <th>Batafsil</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for order in object.doc_orders.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ order.waybill_number }}</td>
+                                <td>{{ order.added_at }}</td>
+                                <td>{{ order.total_sum|floatformat:2|intcomma }} UZS</td>
+                                <td>{{ order.paid_amount|floatformat:2|intcomma }} UZS</td>
+                                <td>{{ order.status }}</td>
+                                <td><a href="/document/sales/update/{{ order.id }}"
+                                       class="btn btn-sm btn-info text-white">Ko'rish</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Buyurtmalar topilmadi.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Customer Balance / Debt -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Moliyaviy Ko'rsatkichlar</h3>
+            </div>
+            <div class="card-body">
+                {% if object.payment_history.all %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Buyurtma</th>
+                            <th>Sana</th>
+                            <th>Summa</th>
+                            <th>Holati</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for order in object.payment_history.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                {% if order.doc_order %}
+                                    <td>{{ order.doc_order }}</td>
+                                {% elif order.old_debt == True %}
+                                    <td><span class="badge bg-success">Eski qarz</span></td>
+                                {% else %}
+                                    <td>-</td>
+                                {% endif %} 
+                                <td>{{ order.added_at }}</td>
+                                <td>{{ order.amount|floatformat:2|intcomma }} UZS</td>
+                                {% if order.payment_type == "debt" %}
+                                    <td><span class="badge bg-danger">Qarz</span></td>
+                                {% else %}
+                                    <td><span class="badge bg-success">To'lov</span></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Malumotlar topilmadi.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </main>
+{% endblock %}

@@ -1,0 +1,432 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Savdo</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/document/sales/create" type="button" class="btn btn-sm btn-outline-primary">
+                        Yangi qoshish <i class="bi bi-plus-circle-dotted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Bosh sahifa</a></li>
+                <li class="breadcrumb-item"><a href="/document/sales/list">Sotuvlar ro'yhati</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Sotish bo'limi</li>
+            </ol>
+        </nav>
+        <div class="">
+
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <label>
+                    <input type="text" name="id" hidden value="{{ doc_order.id }}">
+                </label>
+                <!-- DocPurchase Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Umumiy malumot</h4>
+                        <div class="row mb-3">
+                            {% if doc_order %}
+                                {% if doc_order.status == "completed" %}
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_waybill_number" class="form-label">Buyurtma raqami</label>
+                                        <input type="text" id="id_waybill_number" class="form-control" disabled
+                                               value="{{ doc_order.waybill_number }}">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_customer" class="form-label">Haridor</label>
+                                        <input type="text" id="id_customer" class="form-control" disabled
+                                               value="{{ doc_order.customer }}">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_status" class="form-label">Holati</label>
+                                        <input type="text" id="id_status" class="form-control" disabled
+                                               value="{{ doc_order.get_status }}">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_payment_method" class="form-label">To'lov uslubi</label>
+                                        <input type="text" id="id_payment_method" class="form-control" disabled
+                                               value="{{ doc_order.get_payment_method }}">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_paid_amount" class="form-label">To'langan miqdor</label>
+                                        <input type="text" id="id_paid_amount" class="form-control" disabled
+                                               value="{{ doc_order.paid_amount|floatformat:2|intcomma }}">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_due_date" class="form-label">Qarzni to'lash muddati</label>
+                                        <input type="text" id="id_due_date" class="form-control" disabled
+                                               value="{{ doc_order.due_date }}">
+                                        <small>Kiritish majburiy emas</small>
+                                    </div>
+                                {% else %}
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_customer" class="form-label">Haridor</label>
+                                        {{ doc_order_form.customer }}
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_status" class="form-label">Holati</label>
+                                        {{ doc_order_form.status }}
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_payment_method" class="form-label">To'lov uslubi</label>
+                                        {{ doc_order_form.payment_method }}
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_paid_amount" class="form-label">To'langan miqdor</label>
+                                        <div class="input-group">
+                                            {{ doc_order_form.paid_amount }}
+                                            <button type="button" id="fill_full_amount" class="btn btn-secondary">To'liq
+                                                To'lash
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_due_date" class="form-label">Qarzni to'lash muddati</label>
+                                        {{ doc_order_form.due_date }}
+                                        <small>Kiritish majburiy emas</small>
+                                    </div>
+                                {% endif %}
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_total_sum" class="form-label">Umumiy miqdor</label>
+                                    <input type="text" class="form-control" id="id_total_sum" disabled
+                                           value="{{ doc_order.total_sum|floatformat:2|intcomma }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_created_by" class="form-label">Sotuvchi</label>
+                                    <input type="text" class="form-control" id="id_created_by" disabled
+                                           value="{{ doc_order.created_by }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_added_at" class="form-label">Saqlangan vaqt va sana</label>
+                                    <input type="text" class="form-control" id="id_added_at" disabled
+                                           value="{{ doc_order.added_at }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_modified_by" class="form-label">Taxrirlagan</label>
+                                    <input type="text" class="form-control" id="id_modified_by" disabled
+                                           value="{{ doc_order.modified_by }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_updated_at" class="form-label">Taxrirlangan vaqt va sana</label>
+                                    <input type="text" class="form-control" id="id_updated_at" disabled
+                                           value="{{ doc_order.updated_at }}">
+                                </div>
+                            {% else %}
+                                <div class="col-md-2 mb-2">
+                                    <label for="customer-search" class="form-label">Qidirish</label>
+                                    <input type="search" id="customer-search"
+                                           class="form-control ">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <div class="custom-select-wrapper">
+                                        <label for="customer-select" class="form-label">Haridor</label>
+                                        <select id="customer-select" name="customer" class="form-control" required>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label for="id_payment_method" class="form-label">To'lov uslubi</label>
+                                    {{ doc_order_form.payment_method }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debt -->
+                {% if doc_order %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Qarz malumotlari</h4>
+                            <p><b>Haridorning umumiy
+                                qarzi</b>: {{ doc_order.customer.get_total_debt|floatformat:2|intcomma }} UZS</p>
+                            <p><b>Shu mahsulotlar uchun umumiy
+                                summa</b>: {{ doc_order.total_sum|floatformat:2|intcomma }}</p>
+                            <p><b>Shu mahsulotlar uchun to'lanayotgan
+                                summa</b>: {{ doc_order.paid_amount|floatformat:2|intcomma }}</p>
+                            <p><b>Shu mahsulotlar uchun qarz
+                                miqdori</b>: {{ doc_order.remaining_balance|floatformat:2|intcomma }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- DocPurchaseItem Formset -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h4 class="card-title">Sotiladigan maxsulotlar</h4>
+                            {% if doc_order.status != "completed" %}
+                                <button type="button" id="add-more" class="btn btn-warning"><i
+                                        class="bi bi-plus-circle-dotted"></i></button>
+                            {% endif %}
+                        </div>
+                        {{ formset.management_form }}
+                        <div id="formset-container"> <!-- Formset container -->
+                            <div class="row" id="formset">
+                                {% if status == "update" %}
+                                    {% for form in formset %}
+                                        {{ form.id }}
+                                        {% if doc_order.status == "completed" %}
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" for="id_product">Mahsulot</label>
+                                                <input type="text" class="form-control" id="id_product" disabled
+                                                       value="{{ form.instance.product }}">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" for="id_quantity">Miqdor</label>
+                                                <input type="text" class="form-control" id="id_quantity" disabled
+                                                       value="{{ form.instance.quantity }}">
+                                            </div>
+                                        {% else %}
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Mahsulot</label>
+                                                {{ form.product }}
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Miqdor</label>
+                                                {{ form.quantity }}
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label" for="id_sale_price">Birlik narxi</label>
+                                            <input type="text" class="form-control" id="id_sale_price" disabled
+                                                   value="{{ form.instance.sale_price }}">
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label" for="id_sale_sum">Narx</label>
+                                            <input type="text" class="form-control" id="id_sale_sum" disabled
+                                                   value="{{ form.instance.sale_sum }}">
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    {% if doc_order %}
+                        {% if doc_order.status != "completed" %}
+                            <button type="submit" class="btn btn-primary">
+                                Hisoblash
+                            </button>
+                        {% else %}
+                            <a href="#" class="download-waybill btn btn-primary" data-order-id="{{ doc_order.id }}">
+                                Yuk xatini olish
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">
+                            Hisoblash
+                        </button>
+                    {% endif %}
+                </div>
+            </form>
+
+
+        </div>
+    </main>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalSumInput = document.getElementById('id_total_sum');
+            const paidAmountInput = document.getElementById('id_paid_amount');
+            const fillButton = document.getElementById('fill_full_amount');
+
+            fillButton.addEventListener('click', () => {
+                const totalSum = totalSumInput.value.replace(/,/g, '');
+                paidAmountInput.value = parseFloat(totalSum).toFixed(2);
+            });
+        });
+
+        $(document).ready(function () {
+
+            $('#customer-search').on('input', function () {
+                var query = $(this).val();
+                if (query.length > 0) {
+                    $.ajax({
+                        url: 'http://127.0.0.1:8000/api/customer/list/',
+                        data: {search: query},
+                        success: function (data) {
+                            console.log(data)
+                            // Select elementini tozalash
+                            $('#customer-select').empty();
+
+                            // Yangi ma'lumotlarni select elementiga qo'shish
+
+                            // Natijalarni selectga qo'shish
+                            $.each(data, function (index, customer) {
+                                $('#customer-select').append($('<option>', {
+                                    value: customer.id,
+                                    text: customer.name // Ma'lumotni to'g'ri qo'shish
+                                }));
+                            });
+                        },
+                        error: function () {
+                            console.log('Ma\'lumotlarni yuklashda xato yuz berdi.');
+                        }
+                    });
+                } else {
+                    $('#customer-select').empty();
+                }
+            });
+
+            $('.download-waybill').on('click', function (e) {
+                e.preventDefault();
+
+                const orderId = $(this).data('order-id');
+
+                // API yo'liga GET so'rov yuborish
+                $.ajax({
+                    url: `http://127.0.0.1:8000/api/sales/get-waybill/${orderId}`,
+                    method: 'GET',
+                    success: function (response) {
+                        const waybillPath = `http://127.0.0.1:8000${response.waybill_path}`;
+
+                        if (waybillPath) {
+                            // Faylni yuklab olish uchun yangi oyna ochish
+                            window.open(waybillPath, '_blank');
+                        } else {
+                            alert("Hujjat mavjud emas yoki yuklab bo'lmaydi.");
+                        }
+                    },
+                    error: function () {
+                        alert("Yuk hatini olishda xatolik yuz berdi.");
+                    }
+                });
+            });
+
+            let formIndex = {{ total_form_count|default:0 }};
+            const totalFormsField = $('#id_form-TOTAL_FORMS');
+
+// Fetch all categories
+            function fetchCategoryOptions() {
+                return $.ajax({
+                    url: 'http://127.0.0.1:8000/api/products/category/list/',
+                    method: 'GET',
+                    dataType: 'json'
+                });
+            }
+
+// Fetch products based on category ID
+            function fetchProductOptions(categoryId) {
+                return $.ajax({
+                    url: `http://127.0.0.1:8000/api/products/warehouse/list/?category=${categoryId}`,
+                    method: 'GET',
+                    dataType: 'json'
+                });
+            }
+
+// Add new formset
+            $('#add-more').click(async function () {
+                let initialCategory = $('.category-select').first().val(); // Birinchi kategoriya tanlovini olamiz
+                let categoryOptions = '';
+
+                await fetchCategoryOptions().then(data => {
+                    data.forEach(item => {
+                        const selected = (item.id === initialCategory) ? 'selected' : ''; // Tanlangan kategoriyani belgilaymiz
+                        categoryOptions += `<option value="${item.id}" ${selected}>${item.name}</option>`;
+                    });
+                }).catch(() => {
+                    alert('Failed to load categories');
+                });
+
+                // Append new formset
+                $('#formset').append(
+                    `
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Kategorilar</label>
+            <select name="category-${formIndex}" class="form-control category-select" data-index="${formIndex}">
+                <option value="">-------------------</option>
+                ${categoryOptions}
+            </select>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Mahsulot</label>
+            <select name="form-${formIndex}-product" class="form-control product-select" data-index="${formIndex}" disabled>
+                <option value="">-------------------</option>
+            </select>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Miqdor</label>
+            <input type="number" name="form-${formIndex}-quantity" class="form-control quantity-input" min="1" step="0.01" value="0.00" disabled>
+        </div>
+        <div class="col-md-1">
+            <label for="" class="form-label">O'chirish</label>
+            <div class="form-check d-block">
+                <label class="form-check-label" for="form_delete">Delete</label>
+                <input type="checkbox" name="form-${formIndex}-DELETE" id="form_delete" class="form-check-input">
+            </div>
+        </div>
+        `
+                );
+                formIndex++;
+                totalFormsField.val(formIndex);
+            });
+
+// Handle category selection to load products
+            $(document).on('change', '.category-select', function () {
+                const categorySelect = $(this);
+                const productSelect = categorySelect.closest('.col-md-4').next().find('.product-select');
+                const quantityInput = productSelect.closest('.col-md-4').next().find('.quantity-input');
+
+                const categoryId = categorySelect.val();
+                productSelect.prop('disabled', true).empty().append('<option value="">-------------------</option>');
+                quantityInput.prop('disabled', true).val('0.00');
+
+                if (categoryId) {
+                    fetchProductOptions(categoryId).then(data => {
+                        let productOptions = '';
+                        data.forEach(product => {
+                            productOptions += `<option value="${product.id}" data-quantity="${product.quantity}">${product.name}</option>`;
+                        });
+                        productSelect.append(productOptions).prop('disabled', false);
+                    }).catch(() => {
+                        alert('Failed to load products');
+                    });
+                }
+            });
+
+// Handle product selection to enable quantity input and set max limit
+            $(document).on('change', '.product-select', function () {
+                const selectedOption = $(this).find('option:selected');
+                const maxQuantity = parseFloat(selectedOption.data('quantity') || 0);
+                const quantityInput = $(this).closest('.col-md-4').next().find('.quantity-input');
+
+                quantityInput.prop('disabled', false).attr('max', maxQuantity);
+                quantityInput.val(0.00);
+
+                quantityInput.off('input').on('input', function () {
+                    const enteredQuantity = parseFloat($(this).val());
+                    if (enteredQuantity > maxQuantity) {
+                        alert(`Max miqdor: ${maxQuantity}`);
+                        $(this).val(maxQuantity);
+                    }
+                });
+            });
+
+
+        });
+
+
+    </script>
+
+{% endblock %}

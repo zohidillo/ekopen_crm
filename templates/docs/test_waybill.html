@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuk Xati</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+        }
+
+        .container {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .row {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .col {
+            width: 48%;
+            float: left;
+            padding: 0 10px;
+        }
+
+        .order-details {
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            margin-bottom: 20px;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .order-table th, .order-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+        }
+
+        .order-table th {
+            background-color: #f2f2f2;
+            font-size: 11px;
+        }
+
+        .debt-info {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+            font-size: 10px;
+        }
+
+        .footer {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .footer-left, .footer-right {
+            width: 48%;
+            float: left;
+            padding: 0 10px;
+        }
+
+        /* Jo'natuvchi va Qabul qiluvchi bir qator bo'lishi uchun flex qo'llaniladi */
+        .sender-receiver {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .sender, .receiver {
+            width: 48%;
+        }
+
+        /* Rasmiylashtiruvchi va Imzo bir qator uchun */
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+        {#align-items: center;#} margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .signature-section .signature-box {
+            width: 48%;
+        {#text-align: center;#}
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Yuk Xati</h1>
+        <p>Sana: {{ order.added_at }}</p>
+        <p>Yuk Xati: #{{ order.waybill_number }}</p>
+    </div>
+
+    <!-- Jo'natuvchi va Qabul qiluvchi qismi -->
+    <div class="sender-receiver">
+        <div class="sender">
+            <h3>Jo'natuvchi (Sotuvchi ma'lumotlari)</h3>
+            <p><strong>Kompaniya nomi:</strong> Ekopen Chinobod</p>
+            <p><strong>Manzil:</strong> Farovon ko‘chasi 4, Chinobod, Baliqchi tuman</p>
+            <p><strong>Telefon:</strong> +998 94 104 28 28</p>
+        </div>
+        <div class="receiver">
+            <h3>Qabul qiluvchi (Xaridor ma'lumotlari)</h3>
+            <p><strong>Ismi:</strong> {{ customer.get_full_name }}</p>
+            <p><strong>Manzil:</strong> {{ customer.address }}</p>
+            <p><strong>Telefon:</strong> {{ customer.phone_number }}</p>
+        </div>
+    </div>
+
+    <!-- Buyurtma tafsilotlari jadval tepasida -->
+    <div class="order-details">
+        <h3>Buyurtma tafsilotlari</h3>
+    </div>
+
+    <!-- Jadval -->
+    <div class="table-container table-responsive">
+        <table class="order-table">
+            <thead>
+            <tr>
+                <th>Mahsulot nomi</th>
+                <th>Miqdori</th>
+                <th>Birlik narxi</th>
+                <th>Umumiy narx</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% regroup order_items by product.product.category as category_list %}
+
+            {% for category in category_list %}
+                <tr>
+                    <td colspan="4" class="table-category-header"><strong>{{ category.grouper.name }}</strong></td>
+                </tr>
+                {% for item in category.list %}
+                    <tr>
+                        <td>{{ item.product.product.name }}</td>
+                        <td>{{ item.quantity }} {{ item.product.product.measurement.name }}</td>
+                        <td>{{ item.sale_price }} so'm</td>
+                        <td>{{ item.sale_sum }} so'm</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- To'lov ma'lumotlari -->
+    <div class="debt-info">
+        <h3>To'lov Ma'lumotlari</h3>
+        <p><strong>To'lov turi:</strong> {{ order.get_payment_method }}</p>
+        <p><strong>To'lov holati:</strong> {{ order.get_payment_status }}</p>
+        <p><strong>To'langan summa:</strong> {{ paid_amount }} so'm</p>
+        <p><strong>Qolgan qarz:</strong> {{ remaining_debt }} so'm</p>
+        {% if order.due_date %}
+            <p><strong>Qolgan qarzni qaytarish muddati:</strong> {{ order.due_date }}</p>
+        {% endif %}
+        <p><strong>Hardorning umumiy qarzi:</strong> {{ total_debt }} so'm</p>
+    </div>
+
+    <!-- Rasmiylashtiruvchi va Imzo qismi -->
+    <div class="signature-section">
+        <div class="signature-box">
+            <p><b>Rasmiylashtiruvchi</b>: {{ order.created_by.get_full_name }}</p>
+            <p><b>Sana</b>: {{ order.added_at }}</p>
+        </div>
+        <div class="signature-box" style="text-align: end">
+            <p><b>Imzo</b>: ______________</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

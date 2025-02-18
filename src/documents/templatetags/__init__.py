@@ -1,0 +1,1 @@
+from src.documents.templatetags.custom_filters import *

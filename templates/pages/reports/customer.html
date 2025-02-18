@@ -1,0 +1,254 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+    <style>
+        #TopCustomersPercentChart{
+            height: 100px;
+            width: 100px;
+        }
+    </style>
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <br>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">Hisobot va Tahlillar -> Haridor</h1>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="accordion" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                    aria-controls="flush-collapseOne">
+                                1. Top Haridorlar
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse"
+                             data-bs-parent="#accordionFlushExample">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover border-dark caption-top">
+                                    <caption>Top Haridorlar Hisoboti</caption>
+                                    <thead>
+                                    <tr>
+                                        <th class="bg-secondary-subtle" scope="col">#</th>
+                                        <th class="bg-secondary-subtle" scope="col">Haridor</th>
+                                        <th class="bg-secondary-subtle" scope="col">Jami haridlar miqdori</th>
+                                        <th class="bg-secondary-subtle" scope="col">Jami haridlar summasi</th>
+                                        <th class="bg-secondary-subtle" scope="col">Umumiy savdodan ulushi (foiz)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for obj in top_customers %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                {{ obj.full_name|title }}
+                                            </td>
+                                            <td>{{ obj.total_quantity|default:"0"|floatformat:2|intcomma }}</td>
+                                            <td>{{ obj.total_sum|default:"0"|floatformat:2|intcomma }}</td>
+                                            <td>{{ obj.percentage|floatformat:2 }} %</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart_section">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <canvas id="TopCustomersChart"></canvas>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <canvas id="TopCustomersPercentChart" width="100" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="hr my-3">
+
+            <div class="col-12">
+                <div class="accordion" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                                    aria-controls="flush-collapseTwo">
+                                2. Qarzdor Haridorlar
+                            </button>
+                        </h2>
+                        <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                             data-bs-parent="#accordionFlushExample">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover border-dark caption-top">
+                                    <caption>Qarzdor Haridorlar Hisoboti</caption>
+                                    <thead>
+                                    <tr>
+                                        <th class="bg-secondary-subtle" scope="col">#</th>
+                                        <th class="bg-secondary-subtle" scope="col">Haridor</th>
+                                        <th class="bg-secondary-subtle" scope="col">Jami haridlar miqdori</th>
+                                        <th class="bg-secondary-subtle" scope="col">Umumiy qarz miqdoridagi ulushi (foiz)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for obj in debt_customers %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                {{ obj.get_full_name|title }}
+                                            </td>
+                                            <td>{{ obj.get_total_debt|default:"0"|floatformat:2|intcomma }}</td>
+                                            <td>{{ obj.percentage }} %</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="chart_section">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <p class="text-secondary text-center">Sotib olingan mahsulotlar</p>
+                            <canvas id="PurchaseProductChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function () {
+            let base_url = window.location.origin
+            let background_colors = [
+                'rgba(72, 61, 139, 0.4)',   // Dark Slate Blue
+                'rgba(0, 191, 255, 0.4)',   // Deep Sky Blue
+                'rgba(60, 179, 113, 0.4)',  // Medium Sea Green
+                'rgba(255, 127, 80, 0.4)',  // Coral
+                'rgba(218, 112, 214, 0.4)', // Orchid
+                'rgba(255, 105, 180, 0.4)', // Hot Pink
+                'rgba(100, 149, 237, 0.4)'  // Cornflower Blue
+            ]
+
+            let border_colors = [
+                'rgb(72, 61, 139)',   // Dark Slate Blue
+                'rgb(0, 191, 255)',   // Deep Sky Blue
+                'rgb(60, 179, 113)',  // Medium Sea Green
+                'rgb(255, 127, 80)',  // Coral
+                'rgb(218, 112, 214)', // Orchid
+                'rgb(255, 105, 180)', // Hot Pink
+                'rgb(100, 149, 237)'  // Cornflower Blue
+            ]
+
+            function top_customer_chart(data) {
+                const chart_data = {
+                    labels: data.map(item => item.full_name),
+                    datasets: [{
+                        label: `Eng ko'p harid qilgan haridorlar`,
+                        data: data.map(item => item.total_quantity),
+                        backgroundColor: background_colors,
+                        borderColor: border_colors,
+                        borderWidth: 1,
+                        hoverOffset: 4
+                    }]
+                };
+                const config = {
+                    type: 'bar',
+                    data: chart_data,
+                    options: {
+                        scales: {
+                            x: {
+                                ticks: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        const label = tooltipItem.label || '';
+                                        const value = tooltipItem.raw || 0;
+                                        return `${label}: ${value} ta`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                const ctx = document.getElementById('TopCustomersChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            function top_customer_in_percent_chart(data) {
+                const chart_data = {
+                    labels: data.map(item => item.full_name), // Labels for each slice
+                    datasets: [{
+                        label: 'Eng ko\'p harid qilgan haridorlar (foizda)', // Pie chart title
+                        data: data.map(item => item.percentage), // Percentage values
+                        backgroundColor: border_colors, // Color of the slices
+                        borderWidth: 1,
+                        hoverOffset: 4
+                    }]
+                };
+
+                const config = {
+                    type: 'pie', // Pie chart type
+                    data: chart_data, // Data to be used for the chart
+                    options: {
+                        responsive: true, // Makes the chart responsive
+                        aspectRatio: 1,
+                        plugins: {
+                            legend: {
+                                display: false // Hides the legend completely
+                            },
+                            tooltip: {
+                                enabled: true, // Enable tooltip
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        const label = tooltipItem.label || ''; // Slice label
+                                        const value = tooltipItem.raw || 0; // The raw value for the slice (percentage)
+                                        // Returning the label and percentage formatted as 'Name: X%'
+                                        return `${label}: ${value.toFixed(2)} %`;
+                                    }
+                                }
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                };
+
+                const ctx = document.getElementById('TopCustomersPercentChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            $.ajax({
+                url: base_url + '/api/report/customer/top/',
+                dataType: 'json',
+                success: function (data) {
+                    top_customer_chart(data);
+                    top_customer_in_percent_chart(data);
+                },
+                error: function (err) {
+                    console.error(err);
+                }
+            })
+        })
+    </script>
+
+{% endblock %}
+

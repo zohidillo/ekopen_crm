@@ -1,0 +1,305 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+    <style>
+        .form_delete input {
+            transform: scale(1.2);
+            margin-top: 5px;
+        }
+    </style>
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Sotib olish</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/document/purchase-return/create" type="button" class="btn btn-sm btn-outline-primary">
+                        Yangi qoshish <i class="bi bi-plus-circle-dotted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Bosh sahifa</a></li>
+                <li class="breadcrumb-item"><a href="/document/purchase-return/list">Qaytarilgan mahsulotlar
+                    ro'yhati</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Mahsulotlarni qaytarish bo'limi</li>
+            </ol>
+        </nav>
+        <div class="">
+
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <label>
+                    <input type="text" name="id" hidden value="{{ doc_purchase_return.id }}">
+                </label>
+                <!-- DocPurchase Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Umumiy malumot</h4>
+                        <div class="row mb-3">
+                            {% if doc_purchase_return %}
+                                {% if doc_purchase_return.status == "completed" %}
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_reason" class="form-label">Sabab</label>
+                                        <input type="text" value="{{ doc_purchase_return.get_reason }}"
+                                               name="reason"
+                                               class="form-control" id="id_reason" disabled>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_doc_purchase" class="form-label">Partia</label>
+                                        <input type="text" value="{{ doc_purchase_return.doc_purchase }}"
+                                               name="doc_purchase"
+                                               class="form-control" id="id_doc_purchase" disabled>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_status" class="form-label">Holati</label>
+                                        <input type="text" value="{{ doc_purchase_return.get_status }}"
+                                               name="status"
+                                               class="form-control" id="id_status" disabled>
+                                    </div>
+                                {% else %}
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_supplier" class="form-label">Sabab</label>
+                                        {{ doc_purchase_return_form.reason }}
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_supplier" class="form-label">Partia</label>
+                                        {{ doc_purchase_return_form.doc_purchase }}
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label for="id_status" class="form-label">Holati</label>
+                                        {{ doc_purchase_return_form.status }}
+                                    </div>
+                                {% endif %}
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_created_by" class="form-label">Qabul qiluvchi</label>
+                                    <input type="text" value="{{ doc_purchase_return.created_by }}" name="created_by"
+                                           class="form-control" id="id_created_by" disabled>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_total_purchase_sum" class="form-label">Umumiy narx</label>
+                                    <input type="text" value="{{ doc_purchase_return.total_purchase_sum }}"
+                                           name="total_purchase_sum"
+                                           class="form-control" id="id_total_purchase_sum" disabled>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="id_added_at" class="form-label">Sotib olingan vaqt</label>
+                                    <input type="text" value="{{ doc_purchase_return.added_at }}" name="added_at"
+                                           class="form-control" id="id_added_at" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="id_updated_at" class="form-label">Yangilangan vaqt</label>
+                                    <input type="text" value="{{ doc_purchase_return.updated_at }}" name="updated_at"
+                                           class="form-control" id="id_updated_at" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="id_modified_by" class="form-label">Updated user</label>
+                                    <input type="text" value="{{ doc_purchase_return.modified_by }}" name="modified_by"
+                                           class="form-control" id="id_modified_by" disabled>
+                                </div>
+                            {% else %}
+                                {{ doc_purchase_return_form.errors }}
+                                <div class="col-md-6">
+                                    <label for="id_reason" class="form-label">Sabab</label>
+                                    {{ doc_purchase_return_form.reason }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_doc_purchase" class="form-label">Partia</label>
+                                    {{ doc_purchase_return_form.doc_purchase }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if doc_purchase_return %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Qarz malumotlari</h4>
+                            <br>
+                            <p><b>Umumiy miqdor</b>: {{ doc_purchase_return.total_purchase_sum|floatformat:2|intcomma }} so'm</p>
+                            <p><b>Mahsulotlarning umumiy
+                                miqdori</b>: {{ doc_purchase_return.doc_purchase.total_purchase_sum|floatformat:2|intcomma }} so'm</p>
+                            <p><b>Mahsulotlar uchun to'langan
+                                miqdor</b>: {{ doc_purchase_return.doc_purchase.paid_amount|floatformat:2|intcomma }} so'm
+                            </p>
+                            <p><b>Tashkilotning qoldiq
+                                qarzi</b>: {{ doc_purchase_return.doc_purchase.remaining_balance|floatformat:2|intcomma }} so'm</p>
+                            {% if doc_purchase_return.return_amount == 0.0 %}
+                                <p><b>Haridorga qaytarish kerak bo'lgan
+                                    miqdor</b>: {{ doc_purchase_return.return_amount|floatformat:2|intcomma }} so'm</p>
+                                <small><code>**</code>Eski qarzdan qoplab qolinadi</small>
+                            {% elif doc_purchase_return.return_amount == "" %}
+                                <p><b>Haridorga qaytarish kerak bo'lgan
+                                    miqdor</b>: 0.00 so'm</p>
+                            {% else %}
+                                <p><b>Haridorga qaytarish kerak bo'lgan
+                                    miqdor</b>: {{ doc_purchase_return.return_amount|floatformat:2|intcomma }} so'm</p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- DocPurchaseItem Formset -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h4 class="card-title">Qaytarilayotgan maxsulotlar</h4>
+                            {% if status != "update" %}
+                                <button type="button" id="add-more" class="btn btn-warning"><i
+                                        class="bi bi-plus-circle-dotted"></i></button>
+                            {% endif %}
+                        </div>
+
+                        {{ formset.management_form }}
+                        <div id="formset-container"> <!-- Formset container -->
+                            <div class="row" id="formset">
+                                {% if status == "update" %}
+                                    {% for form in formset %}
+                                        {{ form.error }}
+                                        {{ form.id }}
+                                        {% if doc_purchase_return.status == "completed" %}
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="id_product">Mahsulot</label>
+                                                <input type="text" id="id_product" class="form-control" name="product"
+                                                       disabled
+                                                       value="{{ form.instance.product }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="id_quantity">Miqdor</label>
+                                                <input type="text" id="id_quantity" class="form-control" name="quantity"
+                                                       disabled
+                                                       value="{{ form.instance.quantity }}">
+                                            </div>
+                                        {% else %}
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Mahsulot</label>
+                                                {{ form.product }}
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Miqdor</label>
+                                                {{ form.quantity }}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    {% if doc_purchase_return.status == "completed" %}
+                        <a href="/document/purchase-return/list" class="btn btn-primary">Saqlash</a>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Saqlash</button>
+                    {% endif %}
+                </div>
+            </form>
+
+
+        </div>
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let formIndex = -1;
+            const totalFormsField = $('#id_form-TOTAL_FORMS');
+        
+            // Fetch products based on selected party and build options
+            function fetchProductOptions(partyId) {
+                return $.ajax({
+                    url: `http://127.0.0.1:8000/api/products/list/`,
+                    method: 'GET',
+                    data: {party: partyId}, // Sending party as a parameter
+                    dataType: 'json'
+                });
+            }
+        
+            // Update products list when doc_purchase changes
+            $('#id_doc_purchase').change(function () {
+                const selectedParty = $(this).val();
+                if (selectedParty) {
+                    $('#formset').empty();
+                    formIndex = -1;
+                    totalFormsField.val(0);
+                    $('#add-more').prop('disabled', false);
+        
+                    $('#add-more').off('click').click(async function () {
+                        formIndex++;
+                        let options = '';
+                        let productQuantities = {};  // Dictionary to store each product's max quantity
+        
+                        // Fetch product options and build dropdown
+                        await fetchProductOptions(selectedParty).then(data => {
+                            data.forEach(product => {
+                                options += `<option value="${product.id}">${product.name}</option>`;
+                                productQuantities[product.id] = product.party_item_quantity;  // Store max quantity
+                            });
+                        }).catch(() => {
+                            alert('Mahsulotlarni yuklab bo\'lmadi');
+                        });
+        
+                        $('#formset').append(
+                            `
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mahsulot</label>
+                                <select name="form-${formIndex}-product" class="form-control" data-index="${formIndex}">
+                                    <option value="">-------------------</option>
+                                    ${options}
+                                </select>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">Miqdor</label>
+                                <input type="number" name="form-${formIndex}-quantity" class="form-control" value="0.00" min="0" data-index="${formIndex}">
+                            </div>
+                            <div class="col-md-1">
+                                <label for="" class="form-label">O'chirish</label>
+                                <div class="form-check d-block">
+                                    <label class="form-check-label" for="form_delete">Delete</label>
+                                    <input type="checkbox" name="form-${formIndex}-DELETE" id="form_delete" class="form-check-input">
+                                </div>
+                            </div>
+                            `
+                        );
+                        totalFormsField.val(formIndex + 1);
+        
+                        // Add quantity validation event
+                        $(`input[name="form-${formIndex}-quantity"]`).on('input', function () {
+                            const productSelect = $(`select[name="form-${formIndex}-product"]`);
+                            const selectedProduct = productSelect.val();
+                            const maxQuantity = productQuantities[selectedProduct];  // Get max quantity
+        
+                            // Check if entered quantity exceeds the max allowed
+                            if (maxQuantity && parseFloat($(this).val()) > maxQuantity) {
+                                alert(`Miqdor ${maxQuantity} dan oshmasligi kerak!`);
+                                $(this).val(maxQuantity);  // Reset to max quantity
+                            }
+                        });
+        
+                        // Update max quantity based on selected product
+                        $(`select[name="form-${formIndex}-product"]`).change(function () {
+                            const selectedProduct = $(this).val();
+                            const quantityInput = $(`input[name="form-${formIndex}-quantity"]`);
+                            const maxQuantity = productQuantities[selectedProduct] || 0;
+                            quantityInput.attr('max', maxQuantity);
+                            quantityInput.val(Math.min(quantityInput.val(), maxQuantity));  // Adjust quantity if over limit
+                        });
+                    });
+                } else {
+                    $('#add-more').prop('disabled', true);
+                }
+            });
+        });
+
+    </script>
+
+
+{% endblock %}

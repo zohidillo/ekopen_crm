@@ -1,0 +1,55 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Savdo</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/document/sales-return/create" type="button" class="btn btn-sm btn-outline-primary">
+                        Yangi qoshish <i class="bi bi-plus-circle-dotted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <h2>Qaytarilgan mahsulotlar</h2>
+        <div class="table-responsive small">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Qabul qilib oluvchi</th>
+                    <th scope="col">Haridor</th>
+                    <th scope="col">Holati</th>
+                    <th scope="col">Umumiy narx</th>
+                    <th scope="col">Haridorga qaytarilgan summa</th>
+                    <th scope="col">Sana va vaqt</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td>{{ object.id }}</td>
+                        <td>{{ object.created_by }}</td>
+                        <td>{{ object.doc_order.customer.get_full_name }}</td>
+                        <td>{{ object.status }}</td>
+                        <td>{{ object.total_sum|floatformat:2|intcomma }}</td>
+                        <td>{{ object.return_amount|floatformat:2|intcomma }}</td>
+                        <td>{{ object.added_at }}</td>
+                        <td>
+                            <a href="/document/sales-return/update/{{ object.id }}"><i
+                                    class="bi bi-pencil-square"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "widgets/pagination.html" %}
+    </main>
+{% endblock %}

@@ -1,0 +1,373 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <!-- Header -->
+        <br>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="header">
+                <span class="h2">Bosh sahifa</span>
+            </div>
+        </div>
+
+        <!-- Statistik Ma'lumotlar -->
+        <div class="row mb-4 justify-content-center">
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Sarf</h5>
+                        <p class="h4">
+                            <a href="/document/purchase/list" class="text-dark text-decoration-none">
+                                {{ total_purchase_sum }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Mahsulotlarni sotib olish uchun</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Qarz</h5>
+                        <p class="h4">
+                            <a href="/payments/organization/list" class="text-decoration-none text-dark">
+                                {{ organization_debt }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Tashkilotning umumiy qarzi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Daromad</h5>
+                        <p class="h4">
+                            <a href="/document/sales/list" class="text-decoration-none text-dark">
+                                {{ total_sold_sum }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Sotilgan mahsulotlar summasi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">To'langan qismi</h5>
+                        <p class="h4">
+                            <a href="/document/sales/list" class="text-decoration-none text-dark">
+                                {{ total_paid_sum }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Sotilgan mahsulotlarni to'liq to'langan qismi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Qaytarib olingan</h5>
+                        <p class="h4">{{ total_order_return_sum }}</p>
+                        <p class="text-muted">Qaytarib olingan mahsulotlar summasi</p>
+                    </div>
+                </div>
+            </div>
+
+            {#            <div class="col-lg-3 col-sm-6 mb-3">#}
+            {#                <div class="card shadow-sm">#}
+            {#                    <div class="card-body text-center">#}
+            {#                        <h5 class="card-title">Sof foyda</h5>#}
+            {#                        <p class="h4">{{ count_doc_orders }}</p>#}
+            {#                        <p class="text-muted"></p>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#            </div>#}
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Qoldiq qarz</h5>
+                        <p class="h4">
+                            <a href="/customers/list" class="text-dark text-decoration-none">
+                                {{ total_debt }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Haridorlarning umumiy qarzi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Zahirada</h5>
+                        <p class="h4">
+                            <a href="/document/warehouse/list" class="text-dark text-decoration-none">
+                                {{ total_product_price }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Zahiradagi mahsulotlarning umumiy summasi</p>
+                    </div>
+                </div>
+            </div>
+            {##}
+            {#            <div class="col-lg-3 col-sm-6 mb-3">#}
+            {#                <div class="card shadow-sm">#}
+            {#                    <div class="card-body text-center">#}
+            {#                        <h5 class="card-title">Mijozlar</h5>#}
+            {#                        <p class="h4">{{ count_customers }}</p>#}
+            {#                        <p class="text-muted">Jami mijozlar soni</p>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#            </div>#}
+
+            <div class="col-lg-3 col-sm-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Jami Buyurtmalar</h5>
+                        <p class="h4">
+                            <a href="/document/sales/list" class="text-decoration-none text-dark">
+                                {{ count_orders }}
+                            </a>
+                        </p>
+                        <p class="text-muted">Bajarilmagan: <a
+                                href="/document/sales/list?customer=&payment_method=&payment_status=&status=pending&added_at__gte=&added_at__lte="
+                                class="text-decoration-none text-dark">{{ count_orders_pending }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Statistika grafik usulda ---->
+        <div class="container my-5">
+            <h2 class="text-center">Savdo Statistikasi</h2>
+
+            <div class="text-center mb-4">
+                <button id="showYearlyChart" class="btn btn-primary me-2">Yillik Statistikani Ko‘rsatish</button>
+                <button id="showMonthlyChart" class="btn btn-secondary">Oylik Sotuv va To'lovlar</button>
+            </div>
+
+            <div id="monthlyChartContainer" class="mb-5">
+                <h4 class="text-center">Oylik Sotuv va To'lovlar Holati</h4>
+                <canvas id="monthlySalesPaymentChart" width="400" height="200"></canvas>
+            </div>
+
+            <div id="yearlyChartContainer" class="mb-5" style="display: none;">
+                <h4 class="text-center">Yillik Savdo Statistikasi</h4>
+                <canvas id="yearlySalesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Oxirgi Buyurtmalar -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Oxirgi Buyurtmalar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Buyurtma #</th>
+                        <th>Mijoz</th>
+                        <th>Sana</th>
+                        <th>Umumiy Summa</th>
+                        <th>To'lov Holati</th>
+                        <th>Holati</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for obj in last_orders %}
+                        <tr>
+                            <td><a href="/document/sales/update/{{ obj.id }}">{{ obj.waybill_number }}</a></td>
+                            <td>{{ obj.customer.get_full_name }}</td>
+                            <td>{{ obj.added_at }}</td>
+                            <td>{{ obj.total_sum|floatformat:2|intcomma }}</td>
+                            <td>
+                                {% if obj.payment_status == "paid" %}
+                                    <span class="badge bg-success">{{ obj.get_payment_status }}</span>
+                                {% elif obj.payment_status == "partial_paid" %}
+                                    <span class="badge bg-warning">{{ obj.get_payment_status }}</span>
+                                {% elif obj.payment_status == "overdue" %}
+                                    <span class="badge bg-danger">{{ obj.get_payment_status }}</span>
+                                {% elif obj.payment_status == "debt" %}
+                                    <span class="badge bg-danger">{{ obj.get_payment_status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ obj.waybill_path }}" target="_blank">
+                                    <span class="badge bg-primary">Yuk hatini olish</span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Ombordagi Kamaygan Mahsulotlar -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Ombordagi Kamaygan Mahsulotlar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Mahsulot Nomi</th>
+                        <th>Miqdori</th>
+                        <th>Oxirgi Yangilanish</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for obj in little_of_products %}
+                        <tr>
+                            <td>{{ obj.product.name }}</td>
+                            <td>{{ obj.quantity }} {{ obj.product.measurement.name }}</td>
+                            <td>{{ obj.updated_at }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Yillik Savdo Statistikasi Grafikasi
+        let monthlyChart, yearlyChart;
+
+        function createMonthlyChart(data) {
+            const ctx = document.getElementById('monthlySalesPaymentChart').getContext('2d');
+            if (monthlyChart) monthlyChart.destroy();
+            console.log(data)
+            monthlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data[0].days,
+                    datasets: [
+                        {
+                            label: 'Savdo miqdori',
+                            data: data[0].sales,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'To‘lovlar miqdori',
+                            data: data[0].payments,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Summa (mln so\'m)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createYearlyChart(data) {
+            const ctx = document.getElementById('yearlySalesChart').getContext('2d');
+            if (yearlyChart) yearlyChart.destroy();
+            yearlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data[0].months,
+                    datasets: [
+                        {
+                            label: 'Sotuv miqdori',
+                            data: data[0].sales,
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'To\'langan summa',
+                            data: data[0].payments,
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Summa (mln so\'m)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // AJAX orqali ma'lumotlarni olish
+        function loadMonthlyData() {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/analytics/monthly_sale_data/',
+                method: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    createMonthlyChart(data);
+                }
+            });
+        }
+
+        function loadYearlyData() {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/analytics/yearly_sale_data/',
+                method: 'GET',
+                success: function (data) {
+                    createYearlyChart(data);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            loadMonthlyData();
+
+            $('#showYearlyChart').click(function () {
+                $('#yearlyChartContainer').show();
+                $('#monthlyChartContainer').hide();
+                loadYearlyData();
+            });
+
+            $('#showMonthlyChart').click(function () {
+                $('#monthlyChartContainer').show();
+                $('#yearlyChartContainer').hide();
+                loadMonthlyData();
+            });
+        });
+    </script>
+
+
+{% endblock %}
+

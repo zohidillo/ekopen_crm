@@ -1,0 +1,430 @@
+{% extends "home.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block main %}
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <!-- Header -->
+        <br>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">Hisobot va Tahlillar -> Savdo</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover border-dark caption-top">
+                        <caption>1. Umumiy Savdo Hisoboti</caption>
+                        <thead class="">
+                        <tr>
+                            <th class="bg-secondary-subtle" scope="col">Hisobot Nomi</th>
+                            <th class="bg-secondary-subtle" scope="col">Shu yilgi</th>
+                            <th class="bg-secondary-subtle" scope="col">Shu oydagi</th>
+                            <th class="bg-secondary-subtle" scope="col">Shu chorakdagi</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        <tr>
+                            <td>Umumiy Savdo Tushumi</td>
+                            <td>{{ sale_year }}</td>
+                            <td>{{ sale_month }}</td>
+                            <td>{{ sale_quarter }}</td>
+                        </tr>
+                        <tr>
+                            <td>Sotilgan Mahsulotlar Soni</td>
+                            <td>{{ sale_quantity_year }}</td>
+                            <td>{{ sale_quantity_month }}</td>
+                            <td>{{ sale_quantity_quarter }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="hr my-3">
+
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover border-dark caption-top">
+                        <caption>2. Haridor Bo‘yicha Savdo</caption>
+                        <thead class="">
+                        <tr>
+                            <th class="bg-secondary-subtle" scope="col">ID</th>
+                            <th class="bg-secondary-subtle" scope="col">Haridor</th>
+                            <th class="bg-secondary-subtle" scope="col">Umumiy Xarid (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Qarz (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">To‘langan miqdor (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Qarz miqdori (%)</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        {% for obj in customers %}
+                            <tr>
+                                <td>{{ obj.id }}</td>
+                                <td>{{ obj.get_full_name }}</td>
+                                <td>{{ obj.total_sale_sum|default:0.00|floatformat:2|intcomma }}</td>
+                                <td>{{ obj.total_debt_sum|default:0.00|floatformat:2|intcomma }}</td>
+                                <td>{{ obj.total_paid_sum|default:0.00|floatformat:2|intcomma }}</td>
+                                <td>{{ obj.total_debt_percent|default:0.00|floatformat:2|intcomma }}%</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="hr my-3">
+
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover border-dark caption-top">
+                        <caption>3. Mahsulot Kategoryalari Bo‘yicha Savdo Hisoboti</caption>
+                        <thead class="">
+                        <tr>
+                            <th class="bg-secondary-subtle" scope="col">Kategorya nomi</th>
+                            <th class="bg-secondary-subtle" scope="col">Sotib olingalar</th>
+                            <th class="bg-secondary-subtle" scope="col">Harajat (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Sotilganlar</th>
+                            <th class="bg-secondary-subtle" scope="col">Tushum (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Ombordagi qoldiq</th>
+                            <th class="bg-secondary-subtle" scope="col">Zahira miqdor (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Sotilganlar (%)</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        {% for obj in category %}
+                            <tr>
+                                <td>{{ obj.name }}</td>
+                                <td>{{ obj.total_purchase_count|default:0.00 }}</td>
+                                <td>{{ obj.purchase_total|default:0.00 }}</td>
+                                <td>{{ obj.total_sold_count|default:0.00 }}</td>
+                                <td>{{ obj.sold_total|default:0.00 }}</td>
+                                <td>{{ obj.in_warehouse_count|default:0.00 }}</td>
+                                <td>{{ obj.in_warehouse_price|default:0.00 }}</td>
+                                <td>{{ obj.sold_percent|floatformat:2|default:0.00 }}%</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <div class="pie_chart">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <p class="text-secondary text-center">Sotib olingan mahsulotlar</p>
+                            <canvas id="PurchaseProductChart"></canvas>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <p class="text-secondary text-center">Sotib olingan mahsulotlar (so'm)</p>
+                            <canvas id="PurchaseProductPriceChart"></canvas>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <p class="text-secondary text-center">Sotilgan mahsulotlar</p>
+                            <canvas id="SoldProductChart"></canvas>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <p class="text-secondary text-center">Sotilgan mahsulotlar (so'm)</p>
+                            <canvas id="SoldProductPriceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="hr my-3">
+
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover border-dark caption-top">
+                        <caption>4. Vaqtga Qarab Savdo Hisoboti ({{ year }}-yil)</caption>
+                        <thead class="">
+                        <tr>
+                            <th class="bg-secondary-subtle" scope="col">Oy</th>
+                            <th class="bg-secondary-subtle" scope="col">Harajat (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Miqdor</th>
+                            <th class="bg-secondary-subtle" scope="col">Tushum (so'm)</th>
+                            <th class="bg-secondary-subtle" scope="col">Savdo Soni</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        {% for obj in month_report %}
+                            <tr>
+                                <td>{{ obj.month }}</td>
+                                <td>{{ obj.total_purchase|default:0.00|floatformat:2|intcomma }}</td>
+                                <td>{{ obj.total_purchase_quantity|default:0.00 }}</td>
+                                <td>{{ obj.total_sale|default:0.00|floatformat:2|intcomma }}</td>
+                                <td>{{ obj.total_sale_quantity|default:0.00 }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <div class="pie_chart">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="text-secondary text-center">
+                                Vaqtga Qarab Savdo Hisoboti ({{ year }}-yil) grafik korinishda
+                            </p>
+                            <canvas id="TimeSalesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="hr my-3">
+        </div>
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function () {
+            const apiUrl = 'http://127.0.0.1:8000/api/report/sale/category/';
+
+            function purchase_product_chart(data) {
+                const chart_data = {
+                    labels: data.map(item => item.name),
+                    datasets: [{
+                        label: 'Miqdor',
+                        data: data.map(item => item.total_purchase_count),
+                        backgroundColor: ['#4CAF50', '#FF5722', '#FFC107', '#2196F3', '#FF9800'], // Maxsus ranglar
+                        hoverOffset: 4
+                    }]
+                };
+                const config = {
+                    type: 'polarArea',
+                    data: chart_data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        const label = tooltipItem.label || '';
+                                        const value = tooltipItem.raw || 0;
+                                        return `${label}: ${value} ta`; // Tooltip'dagi ko'rsatma
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                const ctx = document.getElementById('PurchaseProductChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            function purchase_product_price_chart(data) {
+                const price_chart_data = {
+                    labels: data.map(item => item.name),
+                    datasets: [{
+                        label: 'Miqdor',
+                        data: data.map(item => {
+                            // Vergulni olib tashlab, raqamga aylantirish
+                            let numberString = String(item.purchase_total).replace(/\,/g, '');
+                            return parseFloat(numberString.replace(/,/g, '.'));
+                        }),
+                        backgroundColor: ['#FF5722', '#FFC107', '#4CAF50', '#2196F3', '#FF9800'], // Ranglar
+                        hoverOffset: 4
+                    }]
+                };
+
+                const config = {
+                    type: 'polarArea',
+                    data: price_chart_data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false,
+                                position: 'right', // Legend'ni o'ng tomonga ko'chirish
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        const label = tooltipItem.label || '';
+                                        const value = tooltipItem.raw || 0;
+                                        // Raqamni minglik ajratgich bilan formatlash
+                                        const formattedValue = value.toLocaleString('uz-UZ', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
+                                        return `${label}: ${formattedValue} UZS`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const ctx = document.getElementById('PurchaseProductPriceChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            function sale_product_chart(data) {
+                console.log(data)
+                const chart_data = {
+                    labels: data.map(item => item.name),
+                    datasets: [{
+                        label: 'Miqdor',
+                        data: data.map(item => item.total_sold_count),
+                        backgroundColor: ['#4CAF50', '#2196F3', '#FF5722', '#FF9800', '#FFC107'], // Custom colors
+                        hoverOffset: 4
+                    }]
+                };
+                const config = {
+                    type: 'polarArea',
+                    data: chart_data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return `${tooltipItem.label}: ${tooltipItem.raw} ta`; // Custom tooltip format
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                const ctx = document.getElementById('SoldProductChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            function sale_product_price_chart(data) {
+                const price_chart_data = {
+                    labels: data.map(item => item.name),
+                    datasets: [{
+                        label: 'Miqdor',
+                        data: data.map(item => {
+                            let numberString = String(item.sold_total).replace(/\,/g, '');
+                            return parseFloat(numberString.replace(/,/g, '.'));
+                        }),
+                        backgroundColor: ['#FF5722', '#FFC107', '#4CAF50', '#2196F3', '#FF9800'], // Custom colors
+                        hoverOffset: 4
+                    }]
+                };
+                const config = {
+                    type: 'polarArea',
+                    data: price_chart_data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} UZS`; // Custom tooltip format
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                const ctx = document.getElementById('SoldProductPriceChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            function sale_report_month_chart(data) {
+
+                const labels = data.map(item => item.month);
+                const chart_data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Dataset 1',
+                            data: data.map(item => item.total_purchase),
+                            borderColor: ["red"],
+                            backgroundColor: ["red"],
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Dataset 2',
+                            data: data.map(item => item.total_sale),
+                            borderColor: ["green"],
+                            backgroundColor: ["green"],
+                            yAxisID: 'y1',
+                        }
+                    ]
+                };
+                const config = {
+                    type: 'line',
+                    data: chart_data,
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        stacked: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Chart.js Line Chart - Multi Axis'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            },
+                        }
+                    },
+                };
+                const ctx = document.getElementById('TimeSalesChart').getContext('2d');
+                new Chart(ctx, config);
+            }
+
+            $.ajax({
+                url: apiUrl,
+                type: 'GET',
+                data: {},
+                success: function (data) {
+                    purchase_product_chart(data);
+                    purchase_product_price_chart(data)
+                    sale_product_chart(data)
+                    sale_product_price_chart(data)
+                },
+                error: function (error) {
+                }
+            })
+
+            $.ajax({
+                url: "http://127.0.0.1:8000/api/report/sale/month/",
+                type: 'GET',
+                data: {},
+                success: function (data) {
+                    sale_report_month_chart(data)
+                },
+                error: function (error) {
+                }
+            })
+        });
+    </script>
+
+{% endblock %}
+

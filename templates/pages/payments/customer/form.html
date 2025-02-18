@@ -1,0 +1,195 @@
+{% extends "home.html" %}
+{% load static %}
+
+{% block main %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">To'lovlar</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-success">Export</button>
+                    <a href="/payments/customer/create" type="button" class="btn btn-sm btn-outline-primary">
+                        Yangi qo'shish <i class="bi bi-plus-circle-dotted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Bosh sahifa</a></li>
+                <li class="breadcrumb-item"><a href="/payments/customer/list">To'lovlar ro'yhati</a></li>
+                <li class="breadcrumb-item active" aria-current="page">To'lov</li>
+            </ol>
+        </nav>
+
+
+        <div class="container mt-5">
+            <form id="payment-form" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="customer">Haridorlar:</label>
+                    <select id="customer" name="customer" class="form-control" required>
+                        <option value="">--------------------</option>
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="doc-order">Buyurtmalar:</label>
+                    <select id="doc-order" name="doc_order" class="form-control" disabled>
+                        <option value="">--------------------</option>
+                        <!-- Order options will be dynamically populated based on selected customer -->
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="amount">Miqdor:</label>
+                    <input type="number" id="amount" name="amount" class="form-control" min="0.0" step="0.01"
+                           value="{% if payment %}{{ payment.amount }}{% else %}0.0{% endif %}" required>
+                    <small id="debt-warning" class="text-danger" style="display: none;">Amount exceeds order
+                        debt.</small>
+                </div>
+                <br>
+                <div class="form-group form-check">
+                    <input type="checkbox" id="old-debt" name="old_debt" class="form-check-input"
+                           {% if payment and payment.old_debt %}checked{% endif %}>
+                    <label class="form-check-label" for="old-debt">Eski qarz</label>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+            </form>
+        </div>
+
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const customerSelect = $('#customer');
+            const docOrderSelect = $('#doc-order');
+            const amountInput = $('#amount');
+            const debtWarning = $('#debt-warning');
+            const oldDebtCheckbox = $('#old-debt');
+            const submitButton = $('#submit-button');
+            let maxDebt = 0;
+
+            const selectedCustomerId = "{{ payment.customer.id|default:'' }}";
+            const selectedDocOrderId = "{{ payment.doc_order.id|default:'' }}";
+
+            // Xatolikni qizil rangda ko'rsatish funksiyasi
+            function showWarning(message) {
+                debtWarning.text(message).css('color', 'red').show();
+                submitButton.prop('disabled', true);
+            }
+
+            function hideWarning() {
+                debtWarning.hide();
+                submitButton.prop('disabled', false);
+            }
+
+            // Xaridorni yuklash
+            function loadCustomers() {
+                $.ajax({
+                    url: 'http://127.0.0.1:8000/api/customer/list/',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        customerSelect.empty().append('<option value="">Haridorni tanlang</option>');
+
+                        data.forEach(customer => {
+                            const isSelected = customer.id == selectedCustomerId ? 'selected' : '';
+                            customerSelect.append(`<option value="${customer.id}" data-total-debt="${customer.get_total_debt}" ${isSelected}>${customer.name}</option>`);
+                        });
+
+                        // Tanlangan xaridor bo'lsa, uning hujjatlarini yuklash
+                        if (selectedCustomerId) {
+                            loadDocOrders(selectedCustomerId);
+                        }
+                    },
+                    error: function () {
+                        showWarning("Haridorlarni yuklashda xatolik yuz berdi.");
+                    }
+                });
+            }
+
+            // Xarid hujjatlarini yuklash
+            function loadDocOrders(customerId) {
+                $.ajax({
+                    url: `http://127.0.0.1:8000/api/sales/list/?customer=${customerId}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        docOrderSelect.empty().append('<option value="">Doc Orderni tanlang</option>');
+
+                        data.forEach(order => {
+                            const isSelected = order.id == selectedDocOrderId ? 'selected' : '';
+                            docOrderSelect.append(`<option value="${order.id}" data-debt="${order.remaining_balances}" ${isSelected}>${order.name} (Debt: ${order.remaining_balances})</option>`);
+                        });
+
+                        // Tanlangan hujjat bo'lsa, maksimal qarzni belgilang
+                        if (selectedDocOrderId) {
+                            maxDebt = parseFloat(docOrderSelect.find(':selected').data('debt')) || 0;
+                            amountInput.attr('max', maxDebt);
+                            validateAmount();
+                        }
+                    },
+                    error: function () {
+                        showWarning("Hujjatlarni yuklashda xatolik yuz berdi.");
+                    }
+                });
+            }
+
+            // Xaridor tanlanganda tegishli hujjatlarni yuklash
+            customerSelect.change(function () {
+                const customerId = $(this).val();
+                const totalDebt = $(this).find(':selected').data('total-debt') || 0;
+                maxDebt = 0;
+
+                if (!totalDebt && !oldDebtCheckbox.is(':checked')) {
+                    showWarning("Tanlangan xaridorning qarzi mavjud emas.");
+                    docOrderSelect.prop('disabled', true);
+                    amountInput.prop('disabled', true);
+                } else {
+                    docOrderSelect.prop('disabled', false);
+                    amountInput.prop('disabled', false);
+                    hideWarning();
+                    loadDocOrders(customerId);
+                }
+            });
+
+            // Doc Order tanlanganda qarzni belgilash va tekshirish
+            docOrderSelect.change(function () {
+                maxDebt = $(this).find(':selected').data('debt') || 0;
+                amountInput.attr('max', maxDebt);
+                validateAmount();
+            });
+
+            // Qo'shimcha validatsiyalar
+            amountInput.on('input', function () {
+                if (!validatePositiveAmount() || !validateAmount()) {
+                    showWarning("Miqdor noto'g'ri kiritildi.");
+                }
+            });
+
+            // Old Debt belgilanganda tekshiruvlar
+            oldDebtCheckbox.change(function () {
+                const isChecked = $(this).is(':checked');
+                docOrderSelect.prop('disabled', isChecked);
+
+                if (isChecked) {
+                    maxDebt = parseFloat(customerSelect.find(':selected').data('total-debt')) || 0;
+                    amountInput.prop('disabled', maxDebt <= 0);
+                    hideWarning();
+                } else {
+                    validateAmount();
+                }
+            });
+
+            loadCustomers();
+        });
+
+    </script>
+
+
+
+
+{% endblock %}
